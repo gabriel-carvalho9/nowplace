@@ -4,71 +4,113 @@ const btnFoto = document.getElementById("btnFoto");
 const btnRecomecar = document.getElementById("btnRecomecar");
 const btnPublicar = document.getElementById("btnPublicar");
 const instrucao = document.getElementById("instrucao");
+
 const fotoAmbiente = document.getElementById("fotoAmbiente");
 const fotoSelfie = document.getElementById("fotoSelfie");
+const vazioAmbiente = document.getElementById("vazioAmbiente");
+const vazioSelfie = document.getElementById("vazioSelfie");
+
 const descricao = document.getElementById("descricao");
 const localizacao = document.getElementById("localizacao");
+const listaPosts = document.getElementById("listaPosts");
 const semPost = document.getElementById("semPost");
-const post = document.getElementById("post");
-const fotoPrincipal = document.getElementById("fotoPrincipal");
-const fotoMenor = document.getElementById("fotoMenor");
-const textoPost = document.getElementById("textoPost");
-const localPost = document.getElementById("localPost");
-const fotosPost = document.getElementById("fotosPost");
 
 let stream;
 let etapa = 1;
-let ambiente;
-let selfie;
-let local;
+let ambiente = null;
+let selfie = null;
+
+const horas24 = 24 * 60 * 60 * 1000;
 
 async function abrirCamera(tipo) {
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-    }
+    pararCamera();
 
     try {
         stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: tipo },
+            video: {
+                facingMode: { ideal: tipo }
+            },
             audio: false
         });
 
         camera.srcObject = stream;
+
     } catch (erro) {
-        alert("Não foi possível abrir a câmera.");
         console.log(erro);
+        alert("Não foi possível abrir a câmera.");
+    }
+}
+
+function pararCamera() {
+    if (stream) {
+        stream.getTracks().forEach(function(track) {
+            track.stop();
+        });
+
+        stream = null;
     }
 }
 
 function tirarFoto() {
-    canvas.width = camera.videoWidth;
-    canvas.height = camera.videoHeight;
+    if (!camera.videoWidth) {
+        return null;
+    }
+
+    let largura = camera.videoWidth;
+    let altura = camera.videoHeight;
+
+    if (largura > 700) {
+        altura = altura * (700 / largura);
+        largura = 700;
+    }
+
+    canvas.width = largura;
+    canvas.height = altura;
 
     const ctx = canvas.getContext("2d");
-    ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
 
-    return canvas.toDataURL("image/jpeg");
+    ctx.drawImage(
+        camera,
+        0,
+        0,
+        largura,
+        altura
+    );
+
+    return canvas.toDataURL("image/jpeg", 0.65);
 }
 
-btnFoto.addEventListener("click", async function () {
+btnFoto.addEventListener("click", async function() {
+    const foto = tirarFoto();
+
+    if (!foto) {
+        alert("Espere a câmera carregar.");
+        return;
+    }
+
     if (etapa === 1) {
-        ambiente = tirarFoto();
+        ambiente = foto;
 
         fotoAmbiente.src = ambiente;
         fotoAmbiente.style.display = "block";
+        vazioAmbiente.style.display = "none";
 
         etapa = 2;
+
         instrucao.innerText = "Agora tire uma selfie.";
         btnFoto.innerText = "Tirar selfie";
 
         await abrirCamera("user");
+
     } else if (etapa === 2) {
-        selfie = tirarFoto();
+        selfie = foto;
 
         fotoSelfie.src = selfie;
         fotoSelfie.style.display = "block";
+        vazioSelfie.style.display = "none";
 
         etapa = 3;
+
         instrucao.innerText = "Fotos prontas.";
         btnFoto.disabled = true;
         btnPublicar.disabled = false;
@@ -77,22 +119,23 @@ btnFoto.addEventListener("click", async function () {
     }
 });
 
-function pararCamera() {
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-    }
-}
-
-btnRecomecar.addEventListener("click", function () {
+btnRecomecar.addEventListener("click", function() {
     ambiente = null;
     selfie = null;
     etapa = 1;
 
+    fotoAmbiente.src = "";
+    fotoSelfie.src = "";
+
     fotoAmbiente.style.display = "none";
     fotoSelfie.style.display = "none";
 
+    vazioAmbiente.style.display = "flex";
+    vazioSelfie.style.display = "flex";
+
     btnFoto.disabled = false;
     btnPublicar.disabled = true;
+
     btnFoto.innerText = "Tirar foto";
     instrucao.innerText = "Tire uma foto do lugar onde você está.";
 
@@ -100,18 +143,31 @@ btnRecomecar.addEventListener("click", function () {
 });
 
 function pegarLocalizacao() {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
+        if (!navigator.geolocation) {
+            reject();
+            return;
+        }
+
+        localizacao.innerText = "Buscando localização...";
+
         navigator.geolocation.getCurrentPosition(
-            async function (posicao) {
-                const latitude = posicao.coords.latitude;
-                const longitude = posicao.coords.longitude;
+            async function(posicao) {
+                try {
+                    const latitude = posicao.coords.latitude;
+                    const longitude = posicao.coords.longitude;
 
-                local = await buscarEndereco(latitude, longitude);
-                localizacao.innerText = local;
+                    const endereco = await buscarEndereco(latitude, longitude);
 
-                resolve();
+                    localizacao.innerText = endereco;
+                    resolve(endereco);
+
+                } catch (erro) {
+                    reject();
+                }
             },
-            function () {
+
+            function() {
                 reject();
             }
         );
@@ -120,82 +176,232 @@ function pegarLocalizacao() {
 
 async function buscarEndereco(latitude, longitude) {
     const url = "https://nominatim.openstreetmap.org/reverse?lat=" +
-        latitude + "&lon=" + longitude + "&format=jsonv2";
+        latitude + "&lon=" + longitude +
+        "&format=jsonv2&accept-language=pt-BR";
 
     const resposta = await fetch(url);
-    const dados = await resposta.json();
 
-    if (dados.address) {
-        const cidade =
-            dados.address.city ||
-            dados.address.town ||
-            dados.address.village ||
-            "";
-
-        const bairro =
-            dados.address.suburb ||
-            dados.address.neighbourhood ||
-            "";
-
-        if (bairro && cidade) {
-            return bairro + ", " + cidade;
-        }
-
-        if (cidade) {
-            return cidade;
-        }
+    if (!resposta.ok) {
+        throw new Error("Erro ao buscar endereço");
     }
 
-    return dados.display_name;
+    const dados = await resposta.json();
+    const endereco = dados.address || {};
+
+    const bairro =
+        endereco.suburb ||
+        endereco.neighbourhood ||
+        endereco.quarter ||
+        "";
+
+    const cidade =
+        endereco.city ||
+        endereco.town ||
+        endereco.village ||
+        "";
+
+    if (bairro && cidade) {
+        return bairro + ", " + cidade;
+    }
+
+    if (cidade) {
+        return cidade;
+    }
+
+    return dados.display_name || "Localização encontrada";
 }
 
-btnPublicar.addEventListener("click", async function () {
+btnPublicar.addEventListener("click", async function() {
+    if (!ambiente || !selfie) {
+        return;
+    }
+
+    btnPublicar.disabled = true;
     btnPublicar.innerText = "Publicando...";
 
     try {
-        await pegarLocalizacao();
+        const local = await pegarLocalizacao();
 
-        fotoPrincipal.src = ambiente;
-        fotoMenor.src = selfie;
+        const novoPost = {
+            ambiente: ambiente,
+            selfie: selfie,
+            descricao: descricao.value,
+            local: local,
+            data: Date.now()
+        };
 
-        textoPost.innerText = descricao.value;
-        localPost.innerText = "📍" + local;
+        let posts = JSON.parse(localStorage.getItem("meusNows")) || [];
 
-        semPost.style.display = "none";
-        post.style.display = "block";
+        posts.push(novoPost);
 
-        btnPublicar.innerText = "Publicado";
+        localStorage.setItem(
+            "meusNows",
+            JSON.stringify(posts)
+        );
 
-        localStorage.setItem("ultimoNow", Date.now());
-    } catch {
-        btnPublicar.innerText = "Publicar";
+        mostrarPosts();
+        prepararNovoNow();
+
+    } catch (erro) {
+        console.log(erro);
+
+        btnPublicar.disabled = false;
+        btnPublicar.innerText = "Publicar Now";
+
+        localizacao.innerText = "Não foi possível obter a localização.";
+
         alert("Permita o acesso à localização.");
     }
 });
 
-function trocarFotos() {
-    const temp = fotoPrincipal.src;
-    fotoPrincipal.src = fotoMenor.src;
-    fotoMenor.src = temp;
+function prepararNovoNow() {
+    ambiente = null;
+    selfie = null;
+    etapa = 1;
+
+    fotoAmbiente.src = "";
+    fotoSelfie.src = "";
+
+    fotoAmbiente.style.display = "none";
+    fotoSelfie.style.display = "none";
+
+    vazioAmbiente.style.display = "flex";
+    vazioSelfie.style.display = "flex";
+
+    descricao.value = "";
+
+    localizacao.innerText = "Localização será buscada ao publicar.";
+
+    btnFoto.disabled = false;
+    btnFoto.innerText = "Tirar foto";
+
+    btnPublicar.disabled = true;
+    btnPublicar.innerText = "Publicar Now";
+
+    instrucao.innerText = "Tire uma foto do lugar onde você está.";
+
+    abrirCamera("environment");
 }
 
-fotoMenor.addEventListener("click", trocarFotos);
+function mostrarPosts() {
+    let posts = JSON.parse(localStorage.getItem("meusNows")) || [];
 
-fotoPrincipal.addEventListener("dragstart", function (event) {
-    event.dataTransfer.setData("text", "foto");
-});
+    posts = posts.filter(function(post) {
+        return Date.now() - post.data < horas24;
+    });
 
-fotoMenor.addEventListener("dragstart", function (event) {
-    event.dataTransfer.setData("text", "foto");
-});
+    localStorage.setItem(
+        "meusNows",
+        JSON.stringify(posts)
+    );
 
-fotosPost.addEventListener("dragover", function (event) {
-    event.preventDefault();
-});
+    listaPosts.innerHTML = "";
 
-fotosPost.addEventListener("drop", function (event) {
-    event.preventDefault();
-    trocarFotos();
-});
+    if (posts.length === 0) {
+        semPost.style.display = "flex";
+        return;
+    }
 
+    semPost.style.display = "none";
+
+    posts.slice().reverse().forEach(function(dados) {
+        criarPost(dados);
+    });
+}
+
+function criarPost(dados) {
+    const card = document.createElement("div");
+    card.className = "post";
+
+    const fotos = document.createElement("div");
+    fotos.className = "fotos-post";
+
+    const principal = document.createElement("img");
+    principal.className = "foto-principal";
+    principal.src = dados.ambiente;
+    principal.draggable = true;
+
+    const menor = document.createElement("img");
+    menor.className = "foto-menor";
+    menor.src = dados.selfie;
+    menor.draggable = true;
+
+    const info = document.createElement("div");
+    info.className = "info-post";
+
+    const texto = document.createElement("p");
+    texto.className = "texto-post";
+    texto.innerText = dados.descricao || "Sem descrição";
+
+    const local = document.createElement("p");
+    local.className = "local-post";
+    local.innerText = dados.local;
+
+    const tempo = document.createElement("p");
+    tempo.className = "tempo-post";
+    tempo.innerText = calcularTempo(dados.data);
+
+    fotos.appendChild(principal);
+    fotos.appendChild(menor);
+
+    info.appendChild(texto);
+    info.appendChild(local);
+    info.appendChild(tempo);
+
+    card.appendChild(fotos);
+    card.appendChild(info);
+
+    listaPosts.appendChild(card);
+
+    menor.addEventListener("click", function() {
+        trocarFotos(principal, menor);
+    });
+
+    principal.addEventListener("dragstart", function(event) {
+        event.dataTransfer.setData("text/plain", "foto");
+    });
+
+    menor.addEventListener("dragstart", function(event) {
+        event.dataTransfer.setData("text/plain", "foto");
+    });
+
+    fotos.addEventListener("dragover", function(event) {
+        event.preventDefault();
+    });
+
+    fotos.addEventListener("drop", function(event) {
+        event.preventDefault();
+        trocarFotos(principal, menor);
+    });
+}
+
+function trocarFotos(principal, menor) {
+    const temp = principal.src;
+
+    principal.src = menor.src;
+    menor.src = temp;
+}
+
+function calcularTempo(data) {
+    const diferenca = Date.now() - data;
+
+    const minutos = Math.floor(diferenca / 60000);
+    const horas = Math.floor(diferenca / 3600000);
+
+    if (minutos < 1) {
+        return "Publicado agora";
+    }
+
+    if (horas < 1) {
+        return "Publicado há " + minutos + " min";
+    }
+
+    return "Publicado há " + horas + " h";
+}
+
+mostrarPosts();
 abrirCamera("environment");
+
+setInterval(function() {
+    mostrarPosts();
+}, 60000);

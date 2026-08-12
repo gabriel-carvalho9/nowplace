@@ -11,14 +11,13 @@ body {
 }
 
 header {
-    width: 100%;
-    padding: 20px 6%;
     background: #d85f8a;
+    padding: 20px 6%;
     border-bottom: 2px solid white;
 }
 
 header h1 {
-    font-size: 28px;
+    font-size: 27px;
 }
 
 main {
@@ -46,16 +45,15 @@ h2 {
     margin-bottom: 18px;
 }
 
-/* CAMERA */
+/* câmera */
 
 .camera-box {
     width: 100%;
-    height: 320px;
+    height: 310px;
     background: #222;
     border: 2px solid white;
     border-radius: 14px;
     overflow: hidden;
-    margin-bottom: 12px;
 }
 
 #camera {
@@ -70,15 +68,14 @@ h2 {
     margin: 12px 0;
 }
 
-/* BOTÕES */
+/* botões */
 
 button {
-    border: 2px solid white;
-    border-radius: 10px;
     background: #b93f6c;
     color: white;
-    padding: 11px 17px;
-    margin: 0 6px 15px 0;
+    border: 2px solid white;
+    border-radius: 10px;
+    padding: 11px 16px;
     font-size: 14px;
     cursor: pointer;
 }
@@ -88,9 +85,14 @@ button:hover {
 }
 
 button:disabled {
-    background: #bb8b9c;
-    color: #eee;
+    background: #b98b9c;
     cursor: not-allowed;
+}
+
+.botoes-camera {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
 }
 
 #btnRecomecar {
@@ -98,7 +100,7 @@ button:disabled {
 }
 
 #btnRecomecar:hover {
-    background: #c94f7c;
+    background: #c54e79;
 }
 
 #btnPublicar {
@@ -107,12 +109,12 @@ button:disabled {
     font-weight: bold;
 }
 
-/* PREVIEW DAS FOTOS */
+/* preview das fotos */
 
 .previews {
     display: flex;
     gap: 12px;
-    margin: 5px 0 20px;
+    margin-bottom: 20px;
 }
 
 .previews div {
@@ -130,19 +132,29 @@ button:disabled {
 
 .previews img {
     width: 100%;
-    height: 135px;
-    display: none;
+    height: 130px;
     object-fit: cover;
-    background: #e78cab;
     border-radius: 8px;
+    display: none;
 }
 
-/* DESCRIÇÃO */
+.previews span {
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed white;
+    border-radius: 8px;
+    color: #ffe6ef;
+    font-size: 12px;
+}
+
+/* descrição */
 
 label {
     display: block;
-    font-size: 14px;
     margin-bottom: 7px;
+    font-size: 14px;
 }
 
 textarea {
@@ -165,10 +177,10 @@ textarea:focus {
 }
 
 textarea::placeholder {
-    color: #888;
+    color: #777;
 }
 
-/* LOCALIZAÇÃO */
+/* localização */
 
 #localizacao {
     background: #c54e79;
@@ -179,7 +191,7 @@ textarea::placeholder {
     font-size: 13px;
 }
 
-/* SEM POST */
+/* quando não tem nenhum post */
 
 .sem-post {
     min-height: 300px;
@@ -191,18 +203,30 @@ textarea::placeholder {
     justify-content: center;
     text-align: center;
     padding: 20px;
-    color: #ffeaf1;
 }
 
-/* POST */
+/* lista de Nows */
+
+#listaPosts {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* cada Now */
 
 .post {
-    display: none;
     background: #c54e79;
     border: 2px solid white;
     border-radius: 15px;
     overflow: hidden;
 }
+
+#listaPosts .post {
+    display: block;
+}
+
+/* fotos do Now */
 
 .fotos-post {
     position: relative;
@@ -232,25 +256,33 @@ textarea::placeholder {
     cursor: grab;
 }
 
+/* informações do Now */
+
 .info-post {
     padding: 16px;
 }
 
-#textoPost {
+.texto-post {
     font-size: 15px;
     margin-bottom: 10px;
 }
 
-#localPost {
+.local-post {
     display: inline-block;
-    font-size: 12px;
     background: #ad3964;
     border: 1px solid white;
     border-radius: 15px;
     padding: 6px 10px;
+    font-size: 12px;
 }
 
-/* RESPONSIVO */
+.tempo-post {
+    margin-top: 10px;
+    font-size: 11px;
+    color: #ffe4ed;
+}
+
+/* celular */
 
 @media (max-width: 750px) {
     main {
@@ -262,7 +294,7 @@ textarea::placeholder {
     }
 
     .camera-box {
-        height: auto;
+        height: 280px;
     }
 
     .fotos-post {
