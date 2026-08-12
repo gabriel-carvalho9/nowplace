@@ -1,0 +1,271 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #e78cab;
+    color: white;
+}
+
+header {
+    width: 100%;
+    padding: 20px 6%;
+    background: #d85f8a;
+    border-bottom: 2px solid white;
+}
+
+header h1 {
+    font-size: 28px;
+}
+
+main {
+    width: 90%;
+    max-width: 1050px;
+    margin: 35px auto;
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+section {
+    flex: 1;
+}
+
+.criar, .meu-now {
+    background: #d9688e;
+    border: 2px solid white;
+    border-radius: 18px;
+    padding: 22px;
+}
+
+h2 {
+    font-size: 21px;
+    margin-bottom: 18px;
+}
+
+/* CAMERA */
+
+.camera-box {
+    width: 100%;
+    height: 320px;
+    background: #222;
+    border: 2px solid white;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+#camera {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+#instrucao {
+    font-size: 14px;
+    margin: 12px 0;
+}
+
+/* BOTÕES */
+
+button {
+    border: 2px solid white;
+    border-radius: 10px;
+    background: #b93f6c;
+    color: white;
+    padding: 11px 17px;
+    margin: 0 6px 15px 0;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #a9325d;
+}
+
+button:disabled {
+    background: #bb8b9c;
+    color: #eee;
+    cursor: not-allowed;
+}
+
+#btnRecomecar {
+    background: transparent;
+}
+
+#btnRecomecar:hover {
+    background: #c94f7c;
+}
+
+#btnPublicar {
+    width: 100%;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+/* PREVIEW DAS FOTOS */
+
+.previews {
+    display: flex;
+    gap: 12px;
+    margin: 5px 0 20px;
+}
+
+.previews div {
+    width: 50%;
+    background: #c54e79;
+    border: 2px solid white;
+    border-radius: 12px;
+    padding: 9px;
+}
+
+.previews p {
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.previews img {
+    width: 100%;
+    height: 135px;
+    display: none;
+    object-fit: cover;
+    background: #e78cab;
+    border-radius: 8px;
+}
+
+/* DESCRIÇÃO */
+
+label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 7px;
+}
+
+textarea {
+    width: 100%;
+    height: 90px;
+    padding: 12px;
+    resize: none;
+    outline: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    background: #f8d2df;
+    color: #333;
+    border: 2px solid white;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+
+textarea:focus {
+    background: white;
+}
+
+textarea::placeholder {
+    color: #888;
+}
+
+/* LOCALIZAÇÃO */
+
+#localizacao {
+    background: #c54e79;
+    border: 2px solid white;
+    border-radius: 10px;
+    padding: 11px;
+    margin-bottom: 12px;
+    font-size: 13px;
+}
+
+/* SEM POST */
+
+.sem-post {
+    min-height: 300px;
+    background: #c54e79;
+    border: 2px dashed white;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    color: #ffeaf1;
+}
+
+/* POST */
+
+.post {
+    display: none;
+    background: #c54e79;
+    border: 2px solid white;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.fotos-post {
+    position: relative;
+    width: 100%;
+    height: 430px;
+    background: #222;
+    overflow: hidden;
+    border-bottom: 2px solid white;
+}
+
+.foto-principal {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: grab;
+}
+
+.foto-menor {
+    position: absolute;
+    width: 110px;
+    height: 140px;
+    top: 14px;
+    right: 14px;
+    object-fit: cover;
+    border: 3px solid white;
+    border-radius: 12px;
+    cursor: grab;
+}
+
+.info-post {
+    padding: 16px;
+}
+
+#textoPost {
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+#localPost {
+    display: inline-block;
+    font-size: 12px;
+    background: #ad3964;
+    border: 1px solid white;
+    border-radius: 15px;
+    padding: 6px 10px;
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 750px) {
+    main {
+        flex-direction: column;
+    }
+
+    .criar, .meu-now {
+        width: 100%;
+    }
+
+    .camera-box {
+        height: auto;
+    }
+
+    .fotos-post {
+        height: 400px;
+    }
+}

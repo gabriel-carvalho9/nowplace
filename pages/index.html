@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NowPlace</title>
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body>
+    <header>
+        <h1>NowPlace</h1>
+    </header>
+
+    <main>
+        <section class="criar">
+            <h2>Criar Now</h2>
+
+            <div class="camera-box">
+                <video id="camera" autoplay playsinline></video>
+                <canvas id="canvas" hidden></canvas>
+            </div>
+
+            <p id="instrucao">Tire uma foto do lugar onde você está.</p>
+
+            <button id="btnFoto">Tirar foto</button>
+            <button id="btnRecomecar">Recomeçar</button>
+
+            <div class="previews">
+                <div>
+                    <p>Ambiente</p>
+                    <img id="fotoAmbiente" alt="Foto do ambiente">
+                </div>
+
+                <div>
+                    <p>Selfie</p>
+                    <img id="fotoSelfie" alt="Selfie">
+                </div>
+            </div>
+
+            <label for="descricao">O que você está fazendo?</label>
+            <textarea id="descricao" placeholder="Digite aqui..."></textarea>
+
+            <p id="localizacao">📍Localização ainda não encontrada.</p>
+
+            <button id="btnPublicar" disabled>Publicar</button>
+        </section>
+
+        <section class="meu-now">
+            <h2>Meu Now</h2>
+
+            <div id="semPost" class="sem-post">
+                Você ainda não publicou nada.
+            </div>
+
+            <div id="post" class="post">
+                <div id="fotosPost" class="fotos-post">
+                    <img id="fotoPrincipal" class="foto-principal" draggable="true" alt="Foto principal">
+                    <img id="fotoMenor" class="foto-menor" draggable="true" alt="Foto secundária">
+                </div>
+
+                <div class="info-post">
+                    <p id="textoPost"></p>
+                    <p id="localPost"></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../scripts/script.js"></script>
+</body>
+</html>
